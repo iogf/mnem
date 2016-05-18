@@ -1,0 +1,37 @@
+import argparse
+import libmne
+
+        # self.filename=join(expanduser('~'), '.mne')
+
+def build(years, months, days, hours, minutes):
+    if not months: 
+        months.append(randint(1, 12))
+    elif '*' in months:
+        months = xrange(1, 12)
+
+    if not days:
+        days.append(randint(1, 30))
+    elif '*' in days:
+        days = xrange(1, 30)
+
+    if not hours:
+        hours.append(randint(1, 24))
+    elif '*' in hours:
+        hours = xrange(1, 24)
+
+    if not minutes:
+        minutes.append(randint(1, 60))
+    elif '*' in minutes:
+        minutes = xrange(1, 60)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-y', '--years', default=[], nargs='+', help='years')
+    parser.add_argument('-m', '--months', default=[], nargs='+', help='months')
+    parser.add_argument('-d', '--days', default=[], nargs='+', help='days')
+    parser.add_argument('-h', '--hours', default=[], nargs='+', help='hours')
+    parser.add_argument('-i', '--minutes', default=[], nargs='+', help='hours')
+    parser.add_argument('-s', '--start', default=[], nargs='+', help='Start mne daemon.')
+    parser.add_argument('-c', '--count', default=[], help='hours')
+
+
