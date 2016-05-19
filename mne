@@ -9,37 +9,31 @@ from subprocess import call
 import argparse
 import time
 
+class Dzen2(object):
+    def __call__(self, msg, time):
+        lines = msg.count('\n') + 1
+        cmd   = "echo '%s' | dzen2 -p -bg %s -fg %s -l %s -fn %s" % \
+                (msg, self.background, self.foreground, lines, self.font)     
+        call(cmd, shell=True)
+
+    def __init__(self, background='yellow', foreground='black', font='fixed'):
+        self.background = background
+        self.foreground = foreground
+        self.font       = font
+
 class App(Daemon):
-    def __init__(self, bg, fg):
+    def __init__(self, dzen2):
         Daemon.__init__(self, join(expanduser('~'), 'mne.pid'))
 
         # Whenever attempts to stop the daemon
         # before instantiating Mne class.
         self.stop()
-        filename = join(expanduser('~'), '.mne')
-        self.mne = Mne(filename, self.show)
-        self.bg  = bg
-        self.fg  = fg
+        self.mne = Mne(join(expanduser('~'), '.mne'), dzen2)
 
     def run(self):        
         while True:
             time.sleep(5)
             self.mne.process()
-
-    def show(self, msg, time):
-        cmd = "echo '%s' | dzen2 -p -bg %s -fg %s -l 3" % (msg, self.bg, self.fg)
-        call(cmd, shell=True)
-
-def build(years, months, days, hours, minutes):
-    if not months: 
-        months = xrange(1, 12)
-    if not days:
-        days = xrange(1, 30)
-    if not hours:
-        hours = xrange(1, 24)
-    if not minutes:
-        minutes = xrange(1, 60)
-    return years, months, days, hours, minutes
 
 if __name__ == '__main__':
     today  = datetime.today()
@@ -50,14 +44,13 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--days', default=[today.day], nargs='*', help='days')
     parser.add_argument('-u', '--hours', default=[today.hour], nargs='*', help='hours')
     parser.add_argument('-i', '--minutes', default=[today.minute], nargs='*', help='hours')
-    parser.add_argument('--bg', default='yellow', help='Background color.')
-    parser.add_argument('--fg', default='black', help='Foreground color.')
 
-    args = parser.parse_args()
-    app  = App(args.bg, args.fg)
-    app.mne.add(args.msg, 
-            *build(args.years, args.months, args.days,
-                    args.hours, args.minutes))
+    args  = parser.parse_args()
+    dzen2 = Dzen2()
+    app   = App(dzen2)
+    app.mne.add(args.msg, args.years, args.months if args.months else xrange(1, 12),
+                args.days if args.days else xrange(1, 30), args.hours if args.hours else xrange(1, 24),
+                args.minutes if args.minutes else xrange(1, 60))
     app.start()
 
 

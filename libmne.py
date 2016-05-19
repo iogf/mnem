@@ -22,10 +22,10 @@ class Mne(object):
                 self.register(msg, time)
         self.save()
 
-    def rm(self, index):
+    def remove(self, regex):
         pass
 
-    def __str__(self):
+    def find(self, regex):
         pass
 
     def process(self):
@@ -54,5 +54,6 @@ class Mne(object):
         fd = open(self.filename, 'w')
         pickle.dump(self.pool, fd)
         fd.close()
+
 
 
