@@ -30,7 +30,7 @@ def build(years, months, days, hours, minutes):
 
 
 def show(msg, time):
-    call(['dzen2', '-p', '-bg', 'yellow', '-fg', 'black', '-l', '3'])
+    dzen = call('echo %s | dzen2 -p -bg yellow -fg black -l 3' % msg, shell=True)
 
 if __name__ == '__main__':
     today = datetime.today()
