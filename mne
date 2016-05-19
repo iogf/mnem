@@ -4,18 +4,31 @@ from os.path import join, expanduser
 from datetime import datetime
 from random import randint
 from libmne import Mne
+from libdae import Daemon
 from subprocess import call
 import argparse
 import time
 
-class MneDaemon(object):
-    def __init__(self, mne):
-        self.mne = mne
+class App(Daemon):
+    def __init__(self, bg, fg):
+        Daemon.__init__(self, join(expanduser('~'), 'mne.pid'))
+
+        # Whenever attempts to stop the daemon
+        # before instantiating Mne class.
+        self.stop()
+        filename = join(expanduser('~'), '.mne')
+        self.mne = Mne(filename, self.show)
+        self.bg  = bg
+        self.fg  = fg
 
     def run(self):        
         while True:
             time.sleep(5)
             self.mne.process()
+
+    def show(self, msg, time):
+        cmd = 'echo %s | dzen2 -p -bg %s -fg %s -l 3' % (msg, self.bg, self.fg)
+        call(cmd, shell=True)
 
 def build(years, months, days, hours, minutes):
     if not months: 
@@ -28,12 +41,8 @@ def build(years, months, days, hours, minutes):
         minutes = xrange(1, 60)
     return years, months, days, hours, minutes
 
-
-def show(msg, time):
-    dzen = call('echo %s | dzen2 -p -bg yellow -fg black -l 3' % msg, shell=True)
-
 if __name__ == '__main__':
-    today = datetime.today()
+    today  = datetime.today()
     parser = argparse.ArgumentParser()
     parser.add_argument('msg', nargs='?', help='Messages')
     parser.add_argument('-y', '--years', default=[today.year], nargs='*', help='years')
@@ -41,25 +50,14 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--days', default=[today.day], nargs='*', help='days')
     parser.add_argument('-u', '--hours', default=[today.hour], nargs='*', help='hours')
     parser.add_argument('-i', '--minutes', default=[today.minute], nargs='*', help='hours')
-    parser.add_argument('-s', '--start', action='store_true', help='Start mne daemon.')
+    parser.add_argument('--bg', default='yellow', help='Background color.')
+    parser.add_argument('--fg', default='black', help='Foreground color.')
 
-    args     = parser.parse_args()
-    filename = join(expanduser('~'), '.mne')
-    mne      = Mne(show)
-
-    try:
-        mne.load(filename)
-    except IOError:
-        pass
-
-    daemon = MneDaemon(mne)
-
-    if args.start:
-        daemon.run()
-    else:
-        mne.add(args.msg, 
-                *build(args.years, args.months, args.days,
-                        args.hours, args.minutes))
-        mne.save(filename)
+    args = parser.parse_args()
+    app  = App(args.bg, args.fg)
+    app.mne.add(args.msg, 
+            *build(args.years, args.months, args.days,
+                    args.hours, args.minutes))
+    app.start()
 
 

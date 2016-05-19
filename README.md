@@ -3,6 +3,23 @@ mne
 
 A note reminder that uses dzen2 to display notes
 
+Install
+=======
+
+    pip2 install libdae
+    pip2 install mne
+
+Note: It demands dzen2 menu to display the reminders.
+It is problable that your linux distribution lets you easily
+install that.
+
+**See:** https://github.com/robm/dzen
+
+Screenshot
+==========
+
+![screenshot-1](screenshot-1.jpg)
+
 Exampples
 =========
 
@@ -16,6 +33,7 @@ Exampples
     mne 'it will be show every month at the current day/time.' -m  
     
     
+
 
 
 
