@@ -1,37 +1,65 @@
-import argparse
-import libmne
+#! /usr/bin/env python2
 
-        # self.filename=join(expanduser('~'), '.mne')
+from os.path import join, expanduser
+from datetime import datetime
+from random import randint
+from libmne import Mne
+from subprocess import call
+import argparse
+import time
+
+class MneDaemon(object):
+    def __init__(self, mne):
+        self.mne = mne
+
+    def run(self):        
+        while True:
+            time.sleep(5)
+            self.mne.process()
 
 def build(years, months, days, hours, minutes):
     if not months: 
-        months.append(randint(1, 12))
-    elif '*' in months:
         months = xrange(1, 12)
-
     if not days:
-        days.append(randint(1, 30))
-    elif '*' in days:
         days = xrange(1, 30)
-
     if not hours:
-        hours.append(randint(1, 24))
-    elif '*' in hours:
         hours = xrange(1, 24)
-
     if not minutes:
-        minutes.append(randint(1, 60))
-    elif '*' in minutes:
         minutes = xrange(1, 60)
+    return years, months, days, hours, minutes
+
+
+def show(msg, time):
+    call(['dzen2', '-p', '-bg', 'yellow', '-fg', 'black', '-l', '3'])
 
 if __name__ == '__main__':
+    today = datetime.today()
     parser = argparse.ArgumentParser()
-    parser.add_argument('-y', '--years', default=[], nargs='+', help='years')
-    parser.add_argument('-m', '--months', default=[], nargs='+', help='months')
-    parser.add_argument('-d', '--days', default=[], nargs='+', help='days')
-    parser.add_argument('-h', '--hours', default=[], nargs='+', help='hours')
-    parser.add_argument('-i', '--minutes', default=[], nargs='+', help='hours')
-    parser.add_argument('-s', '--start', default=[], nargs='+', help='Start mne daemon.')
-    parser.add_argument('-c', '--count', default=[], help='hours')
+    parser.add_argument('msg', nargs='?', help='Messages')
+    parser.add_argument('-y', '--years', default=[today.year], nargs='*', help='years')
+    parser.add_argument('-m', '--months', default=[today.month], nargs='*', help='months')
+    parser.add_argument('-d', '--days', default=[today.day], nargs='*', help='days')
+    parser.add_argument('-u', '--hours', default=[today.hour], nargs='*', help='hours')
+    parser.add_argument('-i', '--minutes', default=[today.minute], nargs='*', help='hours')
+    parser.add_argument('-s', '--start', action='store_true', help='Start mne daemon.')
+
+    args     = parser.parse_args()
+    filename = join(expanduser('~'), '.mne')
+    mne      = Mne(show)
+
+    try:
+        mne.load(filename)
+    except IOError:
+        pass
+
+    daemon = MneDaemon(mne)
+
+    if args.start:
+        daemon.run()
+    else:
+        mne.add(args.msg, 
+                *build(args.years, args.months, args.days,
+                        args.hours, args.minutes))
+        mne.save(filename)
 
 

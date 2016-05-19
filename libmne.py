@@ -5,28 +5,29 @@ from itertools import product
 import pickle
 
 class Mne(object):
-    def __init__(self):
+    def __init__(self, show):
         self.pool = {}
-        
-    def add(self, action, years, months, days, hours, minutes):
+        self.show = show
+
+    def add(self, msg, years, months, days, hours, minutes):
         for ind in product(years, months, days, hours, minutes):
-            time = datetime(*ind)
+            time = datetime(*map(int, ind))
             if time > datetime.today():
-                self.register(time, action)
+                self.register(msg, time)
 
     def process(self):
-        for indi, indj in self.pool.iteritems():
+        for indi, indj in self.pool.items():
             if datetime.today() > indi: 
-                self.dispatch(indi, indj)
+                self.dispatch(indj, indi)
 
-    def register(self, action, time):
+    def register(self, msg, time):
         if time < datetime.today(): return
-        actions = self.pool.setdefault(time, [])
-        actions.append(action)
+        msgs = self.pool.setdefault(time, [])
+        msgs.append(msg)
 
-    def dispatch(self, time, actions):        
-        for ind in actions[:]:
-            ind(time)
+    def dispatch(self, msgs, time):        
+        for ind in msgs[:]:
+            self.show(ind, time)
         del self.pool[time]
 
     def load(self, filename):
@@ -36,14 +37,7 @@ class Mne(object):
         self.pool.update(pool)
 
     def save(self, filename):
-        fd = open(self.filename, 'w')
+        fd = open(filename, 'w')
         pickle.dump(self.pool, fd)
         fd.close()
-
-class Dzen2(object):
-    pass
-
-
-
-
 
