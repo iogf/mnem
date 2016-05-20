@@ -2,6 +2,7 @@ from random import randint
 from datetime import datetime, timedelta
 from os.path import expanduser, join, exists
 from itertools import product
+from re import search
 import pickle
 
 class Mne(object):
@@ -23,10 +24,17 @@ class Mne(object):
         self.save()
 
     def remove(self, regex):
-        pass
+        for indi, indj in self.pool.iteritems():
+            for indz in indj[:]:
+                if search(regex, indz):
+                    indj.remove(indz)
+        self.save()
 
     def find(self, regex):
-        pass
+        for indi, indj in self.pool.iteritems():
+            for indz in indj:
+                if search(regex, indz):
+                    yield indi, indz
 
     def process(self):
         for indi, indj in self.pool.items():
@@ -54,6 +62,7 @@ class Mne(object):
         fd = open(self.filename, 'w')
         pickle.dump(self.pool, fd)
         fd.close()
+
 
 
 

@@ -35,8 +35,20 @@ class App(Daemon):
             time.sleep(5)
             self.mne.process()
 
-if __name__ == '__main__':
+def main():
     today  = datetime.today()
+    dzen2  = Dzen2()
+    app    = App(dzen2)
+    add    = lambda args: app.mne.add(args.msg, args.years, 
+             args.months if args.months else xrange(1, 12), args.days if args.days else xrange(1, 30), 
+             args.hours if args.hours else xrange(1, 24), args.minutes if args.minutes else xrange(1, 60))
+
+    def find(args):
+        for indi, indj in app.mne.find(args.msg):
+            print indi, indj
+
+    remove = lambda args: app.mne.remove(args.msg)
+
     parser = argparse.ArgumentParser()
     parser.add_argument('msg', nargs='?', help='Messages')
     parser.add_argument('-y', '--years', default=[today.year], nargs='*', help='years')
@@ -45,13 +57,17 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--hours', default=[today.hour], nargs='*', help='hours')
     parser.add_argument('-i', '--minutes', default=[today.minute], nargs='*', help='hours')
 
+    parser.add_argument('-f', '--find', dest='cmd', action='store_const',
+                    const=find, default=add)
+
+    parser.add_argument('-r', '--remove', dest='cmd', action='store_const',
+                    const=remove, default=add)
     args  = parser.parse_args()
-    dzen2 = Dzen2()
-    app   = App(dzen2)
-    app.mne.add(args.msg, args.years, args.months if args.months else xrange(1, 12),
-                args.days if args.days else xrange(1, 30), args.hours if args.hours else xrange(1, 24),
-                args.minutes if args.minutes else xrange(1, 60))
+    args.cmd(args)
     app.start()
 
+
+if __name__ == '__main__':
+    main()
 
 
