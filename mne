@@ -48,31 +48,37 @@ def main():
             print indi, indj
 
     remove = lambda args: app.mne.remove(args.msg)
-
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('msg', nargs='?', help='Messages')
-    parser.add_argument('-y', '--years', default=[today.year], nargs='*', help='years')
-    parser.add_argument('-m', '--months', default=[today.month], nargs='*', help='months')
-    parser.add_argument('-d', '--days', default=[today.day], nargs='*', help='days')
-    parser.add_argument('-u', '--hours', default=[today.hour], nargs='*', help='hours')
-    parser.add_argument('-i', '--minutes', default=[today.minute], nargs='*', help='hours')
+    parser.add_argument('-y', '--years', default=[today.year], nargs='*', help='List of ears.')
+    parser.add_argument('-m', '--months', default=[today.month], nargs='*', help='List of months.')
+    parser.add_argument('-d', '--days', default=[today.day], nargs='*', help='List of days.')
+    parser.add_argument('-u', '--hours', default=[today.hour], nargs='*', help='List of hours.')
+    parser.add_argument('-i', '--minutes', default=[today.minute], nargs='*', help='List of minutes.')
 
     parser.add_argument('-a', '--add', dest='cmd', action='store_const',
-                    const=add)
+                    const=add, help='Add a note.')
 
     parser.add_argument('-f', '--find', dest='cmd', action='store_const',
-                    const=find)
+                    const=find, help='Find a note based on a regex.')
 
     parser.add_argument('-r', '--remove', dest='cmd', action='store_const',
-                    const=remove)
+                    const=remove, help='Remove a note based on a regex.')
     args  = parser.parse_args()
 
-    if args.cmd: args.cmd(args)
+    if args.cmd: 
+        args.cmd(args)
+    else:
+        print 'Starting daemon!'
+
     app.start()
 
 
 if __name__ == '__main__':
     main()
+
+
 
 
 

@@ -45,19 +45,19 @@ mne accepts the following parameters:
     optional arguments:
       -h, --help            show this help message and exit
       -y [YEARS [YEARS ...]], --years [YEARS [YEARS ...]]
-                            years
+                            List of ears.
       -m [MONTHS [MONTHS ...]], --months [MONTHS [MONTHS ...]]
-                            months
+                            List of months.
       -d [DAYS [DAYS ...]], --days [DAYS [DAYS ...]]
-                            days
+                            List of days.
       -u [HOURS [HOURS ...]], --hours [HOURS [HOURS ...]]
-                            hours
+                            List of hours.
       -i [MINUTES [MINUTES ...]], --minutes [MINUTES [MINUTES ...]]
-                            hours
-      -a, --add
-      -f, --find
-      -r, --remove
-    [tau@lambda mne-code]$ 
+                            List of minutes.
+      -a, --add             Add a note.
+      -f, --find            Find a note based on a regex.
+      -r, --remove          Remove a note based on a regex.
+    [tau@lambda mne-code]$     
     
 When mne doesnt find one of the parameters -i -m, -y, -u, -d it assumes the current values 
 for years, minutes, days etc. When it finds these parameters and they aren't followed by
@@ -96,6 +96,20 @@ It will assume years=current, months=current, days=current, hours=24, minutes=40
 
 It will display a note when it is 18/03/2016 at 10:44 am. and when it is
 18/03/2018 at 10:44 too.
+
+**Find notes**
+
+    mne -f 'some.+regex'
+
+It finds all set of notes that matches the regex.
+
+**Remove notes**
+
+    mne -f 'some.+regex'
+
+It removes all notes whose msg matches the regex.
+
+
 
 
 
