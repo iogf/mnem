@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#!/usr/bin/python2
 
 from os.path import join, expanduser
 from datetime import datetime
@@ -57,17 +57,23 @@ def main():
     parser.add_argument('-u', '--hours', default=[today.hour], nargs='*', help='hours')
     parser.add_argument('-i', '--minutes', default=[today.minute], nargs='*', help='hours')
 
+    parser.add_argument('-a', '--add', dest='cmd', action='store_const',
+                    const=add)
+
     parser.add_argument('-f', '--find', dest='cmd', action='store_const',
-                    const=find, default=add)
+                    const=find)
 
     parser.add_argument('-r', '--remove', dest='cmd', action='store_const',
-                    const=remove, default=add)
+                    const=remove)
     args  = parser.parse_args()
-    args.cmd(args)
+
+    if args.cmd: args.cmd(args)
     app.start()
 
 
 if __name__ == '__main__':
     main()
+
+
 
 
