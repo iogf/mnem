@@ -9,7 +9,7 @@ Install
 It is needed to have python2 installed.
 
     pip install libdae
-    pip install mne
+    pip install mnemosyne
 
 Note: It demands dzen2 menu to display the reminders.
 It is problable that your linux distribution lets you easily
@@ -108,6 +108,7 @@ It finds all set of notes that matches the regex.
     mne -f 'some.+regex'
 
 It removes all notes whose msg matches the regex.
+
 
 
 
