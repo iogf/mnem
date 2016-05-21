@@ -1,5 +1,5 @@
-mne
-===
+mnemosyne
+=========
 
 A note reminder that uses dzen2 to display notes
 
@@ -108,6 +108,7 @@ It finds all set of notes that matches the regex.
     mne -f 'some.+regex'
 
 It removes all notes whose msg matches the regex.
+
 
 
 
