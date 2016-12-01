@@ -1,34 +1,27 @@
-from random import randint
 from datetime import datetime, timedelta
-from os.path import expanduser, join, exists
+from subprocess import call
 from itertools import product
 from re import search
 import pickle
+import time
 
-class Mne(object):
-    def __init__(self, filename, show):
+class Mnem(object):
+    def __init__(self, filename, handle=lambda *args: None):
         self.filename = filename
         self.pool     = {}
-        self.show     = show
-
-        try:
-            self.load(self.filename)
-        except IOError:
-            pass
+        self.handle   = handle
 
     def add(self, msg, years, months, days, hours, minutes):
         for ind in product(years, months, days, hours, minutes):
             time = datetime(*map(int, ind))
             if time > datetime.today():
                 self.register(msg, time)
-        self.save()
 
     def remove(self, regex):
         for indi, indj in self.pool.iteritems():
             for indz in indj[:]:
                 if search(regex, indz):
                     indj.remove(indz)
-        self.save()
 
     def find(self, regex):
         for indi, indj in self.pool.iteritems():
@@ -48,21 +41,33 @@ class Mne(object):
 
     def dispatch(self, msgs, time):        
         for ind in msgs[:]:
-            self.show(ind, time)
+            self.handle(ind, time)
         del self.pool[time]
-        self.save()
 
-    def load(self, filename):
-        fd   = open(filename, 'r')
+    def load(self):
+        fd   = open(self.filename, 'r')
         pool = pickle.load(fd)
         fd.close()
         self.pool.update(pool)
+
+    def mainloop(self):
+        while True:
+            time.sleep(5); self.process()
 
     def save(self):
         fd = open(self.filename, 'w')
         pickle.dump(self.pool, fd)
         fd.close()
 
+class Dzen2(object):
+    def __call__(self, msg, time):
+        lines = msg.count('\n') + 1
+        cmd   = "echo '%s' | dzen2 -p -bg %s -fg %s -l %s -fn %s" % \
+                (msg, self.background, self.foreground, lines, self.font)     
+        call(cmd, shell=True)
 
-
+    def __init__(self, background='yellow', foreground='black', font='fixed'):
+        self.background = background
+        self.foreground = foreground
+        self.font       = font
 

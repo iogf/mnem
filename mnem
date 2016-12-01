@@ -1,0 +1,86 @@
+#!/usr/bin/python2
+
+from os.path import join, expanduser
+from datetime import datetime
+from libmnem import Mnem
+from daemon.pidfile import PIDLockFile
+import argparse
+import sys
+import signal
+import time
+import os
+
+def main():
+    today  = datetime.today()
+    mnem   = Mnem(join(expanduser('~'), '.mnem.data'))
+
+    def find(args):
+        for indi, indj in mnem.find(args.msg):
+            print indi, indj
+        
+    parser = argparse.ArgumentParser()
+    parser.add_argument('msg', nargs='?', help='Messages')
+
+    parser.add_argument(
+    '-i', '--minutes', 
+    default=[today.minute], 
+    nargs='*', help='List of minutes.')
+
+    parser.add_argument(
+    '-m', '--months',     
+    default=[today.month], 
+    nargs='*', help='List of months.')
+
+    parser.add_argument(
+    '-y', '--years', 
+    default=[today.year], 
+    nargs='*', help='List of ears.')
+
+    parser.add_argument(
+    '-u', '--hours', 
+    default=[today.hour], 
+    nargs='*', help='List of hours.')
+
+    parser.add_argument(
+    '-d', '--days', default=[today.day], 
+    nargs='*', help='List of days.')
+
+    parser.add_argument(
+    '-a', '--add', dest='cmd', 
+    action='store_const', const=lambda args: 
+    mnem.add(args.msg, args.years, 
+    args.months if args.months else xrange(1, 12), 
+    args.days if args.days else xrange(1, 30), 
+    args.hours if args.hours else xrange(1, 24), 
+    args.minutes if args.minutes else xrange(1, 60)), 
+    help='Add a note.')
+
+    parser.add_argument(
+    '-f', '--find', dest='cmd', 
+    action='store_const', const=find, 
+    help='Find a note based on a regex.')
+
+    parser.add_argument(
+    '-r', '--remove', dest='cmd', 
+    action='store_const', const=lambda args: 
+    mnem.remove(args.msg), 
+    help='Remove a note based on a regex.')
+    args = parser.parse_args()
+
+    if args.cmd: 
+        args.cmd(args)
+    mnem.save()
+
+if __name__ == '__main__':
+    mnem_pid = PIDLockFile(join(expanduser('~'), '.mnem.pid'))
+    pid = mnem_pid.read_pid()
+
+    # Tell the daemon to dump data back to disk.
+    # For not having misbehavior due to it changing
+    # its structure on processment.
+    os.kill(pid, signal.SIGTERM)
+    main()
+    # Tell the daemon to reload the data.
+    os.kill(pid, signal.SIGUSR1)
+
+

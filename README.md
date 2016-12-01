@@ -1,15 +1,17 @@
-mnemosyne
-=========
+mnemm
+====
 
 A note reminder that uses dzen2 to display notes
+
+**Note:** The word mnemm comes from mnemmosyne greek word.
 
 Install
 =======
 
 It is needed to have python2 installed.
 
-    pip install libdae
-    pip install mnemosyne
+    pip install python-daemon
+    pip install mnem
 
 Note: It demands dzen2 menu to display the reminders.
 It is problable that your linux distribution lets you easily
@@ -25,16 +27,17 @@ Screenshot
 Usage
 =====
 
-It is needed first to start mne daemon, in order to do that just issue the command below:
+It is needed first to start mnem daemon, in order to do that just issue the command below:
 
-    mne
+    mnem-daemon
 
-That is enough to have mne daemon running. Figure out how to execute mne at your graphical environment startup.
+That is enough to have mnem daemon running. 
+Figure out how to execute mnem at your graphical environment startup.
 
-mne accepts the following parameters:
+mnem accepts the following parameters:
 
-    [tau@lambda mne-code]$ mne -h
-    usage: mne [-h] [-y [YEARS [YEARS ...]]] [-m [MONTHS [MONTHS ...]]]
+    [tau@lambda mnem-code]$ mnem -h
+    usage: mnem [-h] [-y [YEARS [YEARS ...]]] [-m [MONTHS [MONTHS ...]]]
                [-d [DAYS [DAYS ...]]] [-u [HOURS [HOURS ...]]]
                [-i [MINUTES [MINUTES ...]]] [-a] [-f] [-r]
                [msg]
@@ -57,61 +60,57 @@ mne accepts the following parameters:
       -a, --add             Add a note.
       -f, --find            Find a note based on a regex.
       -r, --remove          Remove a note based on a regex.
-    [tau@lambda mne-code]$     
+    [tau@lambda mnem-code]$     
     
-When mne doesnt find one of the parameters -i -m, -y, -u, -d it assumes the current values 
+When mnem doesnt find one of the parameters -i -m, -y, -u, -d it assumes the current values 
 for years, minutes, days etc. When it finds these parameters and they aren't followed by
 values then it assumes all possible values for the given parameter.
 
 So, if you run the following command:
 
-    mne -a 'this is a note' -u -i 40
+    mnem -a 'this is a note' -u -i 40
 
 It will assume years=current, months=current, days=current, hours=24, minutes=40
 
 **Display a note daily**
 
-    mne -a 'it will be shown every day until the end of the month.' -d  
+    mnem -a 'it will be shown every day until the end of the month.' -d  
 
 **Display a note monthly**
   
-    mne -a 'Title
+    mnem -a 'Title
     It is a message.
     ' -m 
 
 **Display a note monthly on a specific day**
   
-    mne -a 'Testing' -m  -d 1 
+    mnem -a 'Testing' -m  -d 1 
   
 
 **Display a note daily at a specific time**
   
-    mne -a 'Cool note.' -m  -d  -r 15 -e 30 
+    mnem -a 'Cool note.' -m  -d  -r 15 -e 30 
     
     
 **Display a note on a specific date**
 
     
-    mne -a 'this is a note.' -y 2016 2018 -m 3 -u 10 -i 44 -d 18
+    mnem -a 'this is a note.' -y 2016 2018 -m 3 -u 10 -i 44 -d 18
 
 It will display a note when it is 18/03/2016 at 10:44 am. and when it is
 18/03/2018 at 10:44 too.
 
 **Find notes**
 
-    mne -f 'some.+regex'
+    mnem -f 'some.+regex'
 
 It finds all set of notes that matches the regex.
 
 **Remove notes**
 
-    mne -f 'some.+regex'
+    mnem -f 'some.+regex'
 
 It removes all notes whose msg matches the regex.
-
-
-
-
 
 
 
