@@ -73,10 +73,7 @@ def main():
 
 if __name__ == '__main__':
     mnem_pid = PIDLockFile(join(expanduser('~'), '.mnem.pid'))
-
-    mnem_pid.acquire()
-    pid = mnem_pid.read_pid()
-    mnem_pid.break_lock()
+    pid      = mnem_pid.read_pid()
 
     # Tell the daemon to dump data back to disk.
     # For not having misbehavior due to it changing
