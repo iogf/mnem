@@ -91,8 +91,8 @@ that the command was issued.
     mnem -a 'Testing' -m -d 1 
   
 
-The above command tells mnem to display the note every month for the current year
-in the first day of the month.
+The above command tells mnem to display the note in the day 1 of each month along the
+current year.
 
 **Display a note daily at a specific time**
   
@@ -118,6 +118,7 @@ It finds all set of notes that matches the regex.
     mnem -f 'some.+regex'
 
 It removes all notes whose msg matches the regex.
+
 
 
 
