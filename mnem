@@ -13,6 +13,7 @@ import os
 def main():
     today  = datetime.today()
     mnem   = Mnem(join(expanduser('~'), '.mnem.data'))
+    mnem.load()
 
     def find(args):
         for indi, indj in mnem.find(args.msg):
@@ -72,16 +73,11 @@ def main():
     mnem.save()
 
 if __name__ == '__main__':
+    main()
     mnem_pid = PIDLockFile(join(expanduser('~'), '.mnem.pid'))
     pid      = mnem_pid.read_pid()
-
-    # Tell the daemon to dump data back to disk.
-    # For not having misbehavior due to it changing
-    # its structure on processment.
-    os.kill(pid, signal.SIGUSR2)
-    main()
-    # Tell the daemon to reload the data.
     os.kill(pid, signal.SIGUSR1)
+
 
 
 

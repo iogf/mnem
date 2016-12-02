@@ -2,8 +2,10 @@ from datetime import datetime, timedelta
 from subprocess import call
 from itertools import product
 from re import search
+from lockfile import LockFile
 import pickle
 import time
+import os
 
 class Mnem(object):
     def __init__(self, filename, handle=lambda *args: None):
@@ -11,17 +13,24 @@ class Mnem(object):
         self.pool     = {}
         self.handle   = handle
 
+        if not os.path.exists(self.filename):
+            self.create_db()
+
+        self.lock = LockFile(self.filename)
+
     def add(self, msg, years, months, days, hours, minutes):
         for ind in product(years, months, days, hours, minutes):
             time = datetime(*map(int, ind))
             if time > datetime.today():
                 self.register(msg, time)
+        self.save()
 
     def remove(self, regex):
         for indi, indj in self.pool.iteritems():
             for indz in indj[:]:
                 if search(regex, indz):
                     indj.remove(indz)
+        self.save()
 
     def find(self, regex):
         for indi, indj in self.pool.iteritems():
@@ -43,18 +52,28 @@ class Mnem(object):
         for ind in msgs[:]:
             self.handle(ind, time)
         del self.pool[time]
+        self.save()
 
     def load(self):
+        self.lock.acquire()
         fd   = open(self.filename, 'r')
         pool = pickle.load(fd)
         fd.close()
         self.pool.update(pool)
+        self.lock.release()
 
     def mainloop(self):
         while True:
             time.sleep(5); self.process()
 
     def save(self):
+        self.lock.acquire()
+        fd = open(self.filename, 'w')
+        pickle.dump(self.pool, fd)
+        fd.close()
+        self.lock.release()
+
+    def create_db(self):
         fd = open(self.filename, 'w')
         pickle.dump(self.pool, fd)
         fd.close()
@@ -70,4 +89,5 @@ class Dzen2(object):
         self.background = background
         self.foreground = foreground
         self.font       = font
+
 
