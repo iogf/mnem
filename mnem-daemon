@@ -3,7 +3,7 @@
 from daemon.pidfile import PIDLockFile
 from daemon import DaemonContext
 from os.path import join, expanduser
-from libmnem import Mnem, Dzen2
+from mnemcore import Mnem, Dzen2
 import signal
 import sys
 import time
@@ -24,6 +24,7 @@ signal_map = {signal.SIGUSR1: reload})
 with context:
     print 'Daemon started.'
     mnem.mainloop()
+
 
 
 

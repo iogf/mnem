@@ -68,12 +68,15 @@ class Mnem(object):
 
     def save(self):
         self.lock.acquire()
-        fd = open(self.filename, 'w')
-        pickle.dump(self.pool, fd)
-        fd.close()
+        self.create_db()
         self.lock.release()
 
     def create_db(self):
+        """
+        Dump into a file the contents of pool. This
+        method is not using a file lock.
+        """
+
         fd = open(self.filename, 'w')
         pickle.dump(self.pool, fd)
         fd.close()
@@ -89,5 +92,6 @@ class Dzen2(object):
         self.background = background
         self.foreground = foreground
         self.font       = font
+
 
 
