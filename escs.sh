@@ -9,4 +9,9 @@ git status
 git add *
 git commit -a
 git push
+##############################################################################
+cd ~/projects/mnem-code
+python setup.py sdist register upload
+rm -fr dist
+
 

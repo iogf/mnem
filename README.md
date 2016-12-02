@@ -82,10 +82,17 @@ It will assume years=current, months=current, days=current, hours=24, minutes=40
     It is a message.
     ' -m 
 
+The above command will assume days=current, years=current, minutes=current.
+So, the message above will be displayed every month in the same time of the day
+that the command was issued.
+
 **Display a note monthly on a specific day**
   
-    mnem -a 'Testing' -m  -d 1 
+    mnem -a 'Testing' -m -d 1 
   
+
+The above command tells mnem to display the note every month for the current year
+in the first day of the month.
 
 **Display a note daily at a specific time**
   
@@ -111,6 +118,7 @@ It finds all set of notes that matches the regex.
     mnem -f 'some.+regex'
 
 It removes all notes whose msg matches the regex.
+
 
 
 
