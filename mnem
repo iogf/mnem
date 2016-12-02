@@ -73,14 +73,18 @@ def main():
 
 if __name__ == '__main__':
     mnem_pid = PIDLockFile(join(expanduser('~'), '.mnem.pid'))
+
+    mnem_pid.acquire()
     pid = mnem_pid.read_pid()
+    mnem_pid.break_lock()
 
     # Tell the daemon to dump data back to disk.
     # For not having misbehavior due to it changing
     # its structure on processment.
-    os.kill(pid, signal.SIGTERM)
+    os.kill(pid, signal.SIGUSR2)
     main()
     # Tell the daemon to reload the data.
     os.kill(pid, signal.SIGUSR1)
+
 
 

@@ -15,20 +15,27 @@ def reload(*args):
     print 'Reloading data.'
     mnem.load()
 
+def exit(*args):
+    print 'Saving data.'
+    mnem.save()
+    sys.exit()
+
 def dump(*args):
     print 'Saving data.'
     mnem.save()
 
 mnem_pid = PIDLockFile(
 join(expanduser('~'), '.mnem.pid'))
+
 context = DaemonContext(pidfile = mnem_pid, 
 stdout = sys.stdout, stderr = sys.stderr, 
-signal_map = {signal.SIGTERM: dump,
+signal_map = {signal.SIGTERM: exit, signal.SIGUSR2: dump,
 signal.SIGUSR1: reload})
-context.open()
 
-print 'Daemon started.'
-mnem.mainloop()
+with context:
+    print 'Daemon started.'
+    mnem.mainloop()
+
 
 
 
