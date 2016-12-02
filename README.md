@@ -1,9 +1,9 @@
-mnemm
+mnem
 ====
 
 A note reminder that uses dzen2 to display notes
 
-**Note:** The word mnemm comes from mnemmosyne greek word.
+**Note:** The word mnem comes from mnemmosyne greek word.
 
 Install
 =======
@@ -111,6 +111,7 @@ It finds all set of notes that matches the regex.
     mnem -f 'some.+regex'
 
 It removes all notes whose msg matches the regex.
+
 
 
 
