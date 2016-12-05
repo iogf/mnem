@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name="mnem",
-      version="1.1",
+      version="1.2",
       description="A note reminder that uses dzen2 to display notes", 
       scripts=['mnem', 'mnem-daemon'],
       py_modules = ['mnemcore'],
@@ -13,6 +13,7 @@ setup(name="mnem",
       download_url='https://github.com/iogf/mnem/releases',
       keywords=['reminder', 'mne', 'note', 'schedule', 'mnemosyne'],
       classifiers=[])
+
 
 
 

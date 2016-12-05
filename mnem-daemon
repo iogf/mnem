@@ -10,6 +10,7 @@ import time
 
 dzen2 = Dzen2()
 mnem  = Mnem(join(expanduser('~'), '.mnem.data'), dzen2)
+mnem.load()
 
 def reload(*args):
     mnem.load()
@@ -27,6 +28,7 @@ signal_map = {signal.SIGUSR1: reload, signal.SIGTERM: exit})
 with context:
     print 'Daemon started.'
     mnem.mainloop()
+
 
 
 

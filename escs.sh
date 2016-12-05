@@ -13,5 +13,8 @@ git push
 cd ~/projects/mnem-code
 python setup.py sdist register upload
 rm -fr dist
+##############################################################################
+# install.
+cd ~/projects/mnem-code
 
 
