@@ -5,6 +5,7 @@ from datetime import datetime
 from mnemcore import Mnem
 from daemon.pidfile import PIDLockFile
 import argparse
+import tempfile
 import sys
 import signal
 import time
@@ -74,9 +75,10 @@ def main():
 
 if __name__ == '__main__':
     main()
-    mnem_pid = PIDLockFile(join(expanduser('~'), '.mnem.pid'))
+    mnem_pid = PIDLockFile(join(tempfile.gettempdir(), '.mnem.pid'))
     pid      = mnem_pid.read_pid()
     os.kill(pid, signal.SIGUSR1)
+
 
 
 
