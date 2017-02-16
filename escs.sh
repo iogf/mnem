@@ -17,4 +17,8 @@ rm -fr dist
 # install.
 cd ~/projects/mnem-code
 
+git branch -d development
+git push origin :development
+git fetch -p 
+
 

@@ -3,6 +3,7 @@ from subprocess import call
 from itertools import product
 from re import search
 from lockfile import LockFile
+from calendar import monthrange
 import pickle
 import time
 import os
@@ -19,11 +20,23 @@ class Mnem(object):
         self.lock = LockFile(self.filename)
 
     def add(self, msg, years, months, days, hours, minutes):
-        for ind in product(years, months, days, hours, minutes):
-            time = datetime(*map(int, ind))
-            if time > datetime.today():
-                self.register(msg, time)
+        months  = xrange(1, 12) if not months else months
+        hours   = xrange(1, 24) if not hours else hours
+        minutes = xrange(1, 12) if not minutes else minutes
+        prod    = product(years, months, hours, minutes)
+
+        for indi in prod:
+            days = self.get_days_range(indi[0], indi[1], days)
+            for indj in days:
+                time = datetime(int(indi[0]), int(indi[1]), 
+                indj ,int(indi[2]), int(indi[3]))
+                if time > datetime.today():
+                    self.register(msg, time)
         self.save()
+
+    def get_days_range(self, year, month, days):
+        return xrange(1, monthrange(
+        year, month)[1]) if not days else days
 
     def remove(self, regex):
         for indi, indj in self.pool.iteritems():
@@ -92,6 +105,7 @@ class Dzen2(object):
         self.background = background
         self.foreground = foreground
         self.font       = font
+
 
 
 

@@ -51,10 +51,10 @@ def main():
     '-a', '--add', dest='cmd', 
     action='store_const', const=lambda args: 
     mnem.add(args.msg, args.years, 
-    args.months if args.months else xrange(1, 12), 
-    args.days if args.days else xrange(1, 30), 
-    args.hours if args.hours else xrange(1, 24), 
-    args.minutes if args.minutes else xrange(1, 60)), 
+    args.months if args.months else None, 
+    args.days if args.days else None, 
+    args.hours if args.hours else None, 
+    args.minutes if args.minutes else None), 
     help='Add a note.')
 
     parser.add_argument(
@@ -78,6 +78,7 @@ if __name__ == '__main__':
     mnem_pid = PIDLockFile(join(tempfile.gettempdir(), '.mnem.pid'))
     pid      = mnem_pid.read_pid()
     os.kill(pid, signal.SIGUSR1)
+
 
 
 
