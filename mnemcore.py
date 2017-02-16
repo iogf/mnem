@@ -26,8 +26,7 @@ class Mnem(object):
         prod    = product(years, months, hours, minutes)
 
         for indi in prod:
-            days = self.get_days_range(indi[0], indi[1], days)
-            for indj in days:
+            for indj in self.get_days_range(indi[0], indi[1], days):
                 time = datetime(int(indi[0]), int(indi[1]), 
                 indj ,int(indi[2]), int(indi[3]))
                 if time > datetime.today():
@@ -105,6 +104,7 @@ class Dzen2(object):
         self.background = background
         self.foreground = foreground
         self.font       = font
+
 
 
 
