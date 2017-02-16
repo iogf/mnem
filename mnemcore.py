@@ -28,7 +28,7 @@ class Mnem(object):
         for indi in prod:
             for indj in self.get_days_range(indi[0], indi[1], days):
                 time = datetime(int(indi[0]), int(indi[1]), 
-                indj ,int(indi[2]), int(indi[3]))
+                int(indj) ,int(indi[2]), int(indi[3]))
                 if time > datetime.today():
                     self.register(msg, time)
         self.save()
