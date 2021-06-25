@@ -1,8 +1,8 @@
-#!/usr/bin/python2
+#!/usr/bin/python
 
 from os.path import join, expanduser
 from datetime import datetime
-from mnemcore import Mnem
+from libmn import Mnem
 from daemon.pidfile import PIDLockFile
 import argparse
 import tempfile
@@ -13,48 +13,43 @@ import os
 
 def main():
     today  = datetime.today()
-    mnem   = Mnem(join(expanduser('~'), '.mnem.data'))
-    mnem.load()
+    mnem   = Mnem(join(expanduser('~'), 'mnem.db'))
 
     def find(args):
         for indi, indj in mnem.find(args.msg):
-            print indi, indj
+            print(indi, indj)
         
     parser = argparse.ArgumentParser()
     parser.add_argument('msg', nargs='?', help='Messages')
 
     parser.add_argument(
     '-i', '--minutes', 
-    default=[today.minute], 
+    default=[today.minute],  type=int,
     nargs='*', help='List of minutes.')
 
     parser.add_argument(
     '-m', '--months',     
-    default=[today.month], 
+    default=[today.month],  type=int,
     nargs='*', help='List of months.')
 
     parser.add_argument(
     '-y', '--years', 
-    default=[today.year], 
+    default=[today.year], type=int,
     nargs='*', help='List of ears.')
 
     parser.add_argument(
     '-u', '--hours', 
-    default=[today.hour], 
+    default=[today.hour],  type=int,
     nargs='*', help='List of hours.')
 
     parser.add_argument(
-    '-d', '--days', default=[today.day], 
+    '-d', '--days', default=[today.day],  type=int,
     nargs='*', help='List of days.')
 
-    parser.add_argument(
-    '-a', '--add', dest='cmd', 
+    parser.add_argument('-a', '--add', dest='cmd', 
     action='store_const', const=lambda args: 
-    mnem.add(args.msg, args.years, 
-    args.months if args.months else None, 
-    args.days if args.days else None, 
-    args.hours if args.hours else None, 
-    args.minutes if args.minutes else None), 
+    mnem.add_note(args.msg, args.years, args.months, 
+    args.days, args.hours, args.minutes), 
     help='Add a note.')
 
     parser.add_argument(
@@ -65,23 +60,18 @@ def main():
     parser.add_argument(
     '-r', '--remove', dest='cmd', 
     action='store_const', const=lambda args: 
-    mnem.remove(args.msg), 
+    mnem.del_note(args.msg), 
     help='Remove a note based on a regex.')
     args = parser.parse_args()
 
     if args.cmd: 
         args.cmd(args)
-    mnem.save()
+    mnem.conn.close()
 
 if __name__ == '__main__':
     main()
-    mnem_pid = PIDLockFile(join(tempfile.gettempdir(), '.mnem.pid'))
-    pid      = mnem_pid.read_pid()
-    os.kill(pid, signal.SIGUSR1)
-
-
-
-
-
+    # mnem_pid = PIDLockFile(join(tempfile.gettempdir(), 'mnem.pid'))
+    # pid      = mnem_pid.read_pid()
+    # os.kill(pid, signal.SIGUSR1)
 
 
