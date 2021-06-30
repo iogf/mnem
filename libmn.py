@@ -12,22 +12,36 @@ class Mnem:
         self.handle = handle
         self.conn   = sqlite3.connect(dbpath)
 
+
+        self.conn.execute('''CREATE TABLE IF NOT EXISTS REGCMD
+        (CMD TEXT, MSG TEXT);''')
+
         self.conn.execute('''CREATE TABLE IF NOT EXISTS DATETIME
-        (MSG       TEXT,
-        TIME      INT);
-        ''')
+        (TIME INT, REGCMD_ID INT, 
+        FOREIGN KEY(REGCMD_ID) REFERENCES REGCMD(ROWID)
+        ON DELETE CASCADE);''')
+
         self.conn.commit()
 
-    def add_note(self, msg, years, months, days, hours, minutes):
-        dates = product([msg], years, months, days, hours, minutes)
+    def add_note(self, cmd, msg, years, months, days, hours, minutes):
+        # months  = xrange(1, 12) if not months else months
+        # hours   = xrange(1, 24) if not hours else hours
+        # minutes = xrange(1, 12) if not minutes else minutes
+        # days = range(1, monthrange(years, months)[1]) 
 
-        query = '''INSERT INTO DATETIME (MSG, TIME) 
-        VALUES ('{msg}', {time});'''
+        dates  = product(years, months, days, hours, minutes)
+        query0 = '''INSERT INTO REGCMD (CMD, MSG) 
+        VALUES ('{cmd}', '{msg}');'''
+
+        cursor = self.conn.execute(query0.format(cmd=cmd, msg=msg))
+        self.conn.commit()
+        query1 = '''INSERT INTO DATETIME (TIME, REGCMD_ID) 
+        VALUES ({time}, {regcmd_id});'''
 
         for ind in dates:
-            tval = time.mktime(datetime(year=ind[1], month=ind[2], 
-                day=ind[3], hour=ind[4], minute=ind[5], second=0).timetuple())
-            self.conn.execute(query.format(msg=ind[0], time=tval))
+            tval = time.mktime(datetime(year=ind[0], month=ind[1], 
+                day=ind[2], hour=ind[3], minute=ind[4], second=0).timetuple())
+            self.conn.execute(query1.format(time=tval, regcmd_id=cursor.lastrowid))
         self.conn.commit()
 
     def del_note(self, regex):
@@ -38,9 +52,10 @@ class Mnem:
 
     def process(self):
         now = datetime.now()
-        query0 = '''SELECT MSG FROM DATETIME 
-        WHERE TIME <= {time};
+        query0 = '''SELECT MSG, DATETIME.ROWID FROM REGCMD INNER JOIN DATETIME
+        ON DATETIME.TIME <= {time} AND REGCMD.ROWID = DATETIME.REGCMD_ID;
         '''
+
         tval = time.mktime(datetime(year=now.year, month=now.month, 
         day=now.day, hour=now.hour, minute=now.minute).timetuple())
         query0  = query0.format(time=tval)
@@ -48,19 +63,22 @@ class Mnem:
         records = cursor.fetchall()
 
         for ind in records:
-            Dzen2()(ind[0], str(now))
-
-        query1 = 'DELETE FROM DATETIME WHERE TIME <= {time};'
-        cursor.execute(query1.format(time=tval))
-        self.conn.commit()
+            self.display_and_update(ind)
         print(records)
+
+    def display_and_update(self, record):
+        query0 = 'DELETE FROM DATETIME WHERE ROWID <= {rowid};'
+        dzen = Dzen2()
+        dzen(record[0])
+        self.conn.execute(query0.format(rowid=record[1]))
+        self.conn.commit()
 
     def mainloop(self):
         while True:
             time.sleep(5); self.process()
 
 class Dzen2:
-    def __call__(self, msg, time):
+    def __call__(self, msg):
         lines = msg.count('\n') + 1
         cmd   = "echo '%s' | dzen2 -p -bg %s -fg %s -l %s -fn %s" % \
                 (msg, self.background, self.foreground, lines, self.font)     
