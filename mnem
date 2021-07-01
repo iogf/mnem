@@ -14,11 +14,13 @@ import os
 mnem = Mnem(join(expanduser('~'), 'mnem.db'))
 
 def handle_find(args):
-    pass
+    mnem.find(args.msg, args.years, 
+    args.months, args.days, args.hours, args.minutes)
 
 def handle_add(args):
-    mnem.add_note(' '.join(sys.argv), args.msg, args.years, args.months, 
-    args.days, args.hours, args.minutes)
+    dates = mnem.exp_dates(args.years, 
+    args.months, args.days, args.hours, args.minutes)
+    mnem.add_note(' '.join(sys.argv), args.msg, dates)
 
 def main():
     today  = datetime.today()
@@ -32,7 +34,7 @@ def main():
     nargs='*', help='List of minutes.')
 
     parser.add_argument(
-    '-m', '--months',     
+    '-m', '--months', dest='months',    
     default=[today.month],  type=int,
     nargs='*', help='List of months.')
 
@@ -55,7 +57,7 @@ def main():
     help='Add a note.')
 
     parser.add_argument(
-    '-f', '--find', dest='regex', 
+    '-f', '--find', dest='cmd', 
     action='store_const', const=handle_find,
     help='Find a note based on a regex.')
 

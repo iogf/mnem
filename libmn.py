@@ -12,44 +12,83 @@ class Mnem:
         self.handle = handle
         self.conn   = sqlite3.connect(dbpath)
 
+        self.conn.execute(''' CREATE TABLE IF NOT EXISTS REGCMD
+        (CMD TEXT, MSG TEXT); ''')
 
-        self.conn.execute('''CREATE TABLE IF NOT EXISTS REGCMD
-        (CMD TEXT, MSG TEXT);''')
-
-        self.conn.execute('''CREATE TABLE IF NOT EXISTS DATETIME
-        (TIME INT, REGCMD_ID INT, 
-        FOREIGN KEY(REGCMD_ID) REFERENCES REGCMD(ROWID)
-        ON DELETE CASCADE);''')
+        self.conn.execute(''' CREATE TABLE IF NOT EXISTS DATETIME
+        (TIME INT, YEAR INT, MONTH INT, DAY INT, HOUR INT, MINUTE INT, 
+        REGCMD_ID INT, FOREIGN KEY(REGCMD_ID) REFERENCES REGCMD(ROWID)
+        ON DELETE CASCADE); ''')
 
         self.conn.commit()
 
-    def add_note(self, cmd, msg, years, months, days, hours, minutes):
-        # months  = xrange(1, 12) if not months else months
-        # hours   = xrange(1, 24) if not hours else hours
-        # minutes = xrange(1, 12) if not minutes else minutes
-        # days = range(1, monthrange(years, months)[1]) 
-
-        dates  = product(years, months, days, hours, minutes)
-        query0 = '''INSERT INTO REGCMD (CMD, MSG) 
-        VALUES ('{cmd}', '{msg}');'''
+    def add_note(self, cmd, msg, dates):
+        query0 = ''' INSERT INTO REGCMD (CMD, MSG) 
+        VALUES ('{cmd}', '{msg}'); '''
 
         cursor = self.conn.execute(query0.format(cmd=cmd, msg=msg))
         self.conn.commit()
-        query1 = '''INSERT INTO DATETIME (TIME, REGCMD_ID) 
-        VALUES ({time}, {regcmd_id});'''
 
         for ind in dates:
-            tval = time.mktime(datetime(year=ind[0], month=ind[1], 
-                day=ind[2], hour=ind[3], minute=ind[4], second=0).timetuple())
-            self.conn.execute(query1.format(time=tval, regcmd_id=cursor.lastrowid))
+            self.mk_qdate(ind, cursor.lastrowid)
         self.conn.commit()
+
+    def mk_qdate(self, date, regcmd_id):
+        query = ''' INSERT INTO DATETIME 
+        (TIME, YEAR, MONTH, DAY, HOUR, MINUTE, REGCMD_ID) 
+        VALUES %s ; '''
+
+        tval = time.mktime(datetime(*date, second=0).timetuple())
+        query = query % str((tval, ) + date + (regcmd_id, ))
+        self.conn.execute(query)
+
+    def exp_dates(self, years, months, days, hours, minutes):
+        months  = months if months else range(1, 12)
+        hours   = hours if  hours else range(1, 24) 
+        minutes = minutes if minutes else range(1, 12) 
+
+        if bool(days) is True :
+            return product(years, months, days, hours, minutes)
+        else:
+            return self.date_range(years, months, hours, minutes)
+
+    def date_range(self, years, months, hours, minutes):
+        dates = product(years, months)
+        for year, month in dates:
+            yield from product((year,), (month,), range(1, 
+                monthrange(year, month)[1]), hours, minutes) 
 
     def del_note(self, regex):
         pass
 
-    def find(self, regex):
-        pass
+    def find(self, msg, years, months, days, hours, minutes):
+        query = '''SELECT DISTINCT cmd FROM REGCMD INNER JOIN DATETIME ON
+        REGCMD.ROWID = DATETIME.REGCMD_ID AND {cond}
+        '''
 
+        years = [str(ind) for ind in years]
+        months = [str(ind) for ind in months]
+        days = [str(ind) for ind in days]
+        hours = [str(ind) for ind in hours]
+        minutes = [str(ind) for ind in minutes]
+
+        cond0 = ('DATETIME.YEAR IN (%s)' % ', '.join(years)) if years else ''
+        cond1 = ('DATETIME.MONTH IN (%s)' % ', '.join(months)) if months else ''
+        cond2 = ('DATETIME.DAY IN (%s)' % ', '.join(days)) if days else ''
+        cond3 = ('DATETIME.HOUR IN (%s)' % ', '.join(hours)) if hours else ''
+        cond4 = ('DATETIME.MINUTE IN (%s)' % ', '.join(minutes)) if minutes else ''
+        cond5 = "REGCMD.MSG LIKE '%{msg}%'".format(msg = (msg if msg else ''))
+        conds = (ind for ind in (cond0, cond1, cond2, cond3, cond4, cond5)
+        if ind)
+
+        query = query.format(cond=' AND '.join(conds))
+        print('Query:', query)
+        cursor  = self.conn.execute(query)
+        records = cursor.fetchall()
+
+        for ind in records:
+            print('Cmd:', ind)
+        
     def process(self):
         now = datetime.now()
         query0 = '''SELECT MSG, DATETIME.ROWID FROM REGCMD INNER JOIN DATETIME
