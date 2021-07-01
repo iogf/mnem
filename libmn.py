@@ -20,6 +20,14 @@ class Mnem:
         REGCMD_ID INT, FOREIGN KEY(REGCMD_ID) REFERENCES REGCMD(ROWID)
         ON DELETE CASCADE); ''')
 
+        self.conn.execute(''' create trigger 
+        if not exists clean after delete on datetime
+        when (select count(*) from datetime where regcmd_id = OLD.regcmd_id) = 0
+        
+        begin
+        delete from regcmd where rowid = OLD.regcmd_id;
+        end;''')
+
         self.conn.commit()
 
     def add_note(self, cmd, msg, dates):
@@ -66,20 +74,21 @@ class Mnem:
         REGCMD.ROWID = DATETIME.REGCMD_ID AND {cond}
         '''
 
-        years = [str(ind) for ind in years]
-        months = [str(ind) for ind in months]
-        days = [str(ind) for ind in days]
-        hours = [str(ind) for ind in hours]
-        minutes = [str(ind) for ind in minutes]
+        years = ', '.join((str(ind) for ind in years))
+        months = ', '.join((str(ind) for ind in months))
+        days = ', '.join((str(ind) for ind in days))
+        hours = ', '.join((str(ind) for ind in hours))
+        minutes = ', '.join((str(ind) for ind in minutes))
 
-        cond0 = ('DATETIME.YEAR IN (%s)' % ', '.join(years)) if years else ''
-        cond1 = ('DATETIME.MONTH IN (%s)' % ', '.join(months)) if months else ''
-        cond2 = ('DATETIME.DAY IN (%s)' % ', '.join(days)) if days else ''
-        cond3 = ('DATETIME.HOUR IN (%s)' % ', '.join(hours)) if hours else ''
-        cond4 = ('DATETIME.MINUTE IN (%s)' % ', '.join(minutes)) if minutes else ''
+        cond0 = ('DATETIME.YEAR IN (%s)' % years) if years else ''
+        cond1 = ('DATETIME.MONTH IN (%s)' % months) if months else ''
+        cond2 = ('DATETIME.DAY IN (%s)' % days) if days else ''
+        cond3 = ('DATETIME.HOUR IN (%s)' % hours) if hours else ''
+        cond4 = ('DATETIME.MINUTE IN (%s)' % minutes) if minutes else ''
         cond5 = "REGCMD.MSG LIKE '%{msg}%'".format(msg = (msg if msg else ''))
-        conds = (ind for ind in (cond0, cond1, cond2, cond3, cond4, cond5)
-        if ind)
+
+        conds = (ind for ind in (cond0, cond1, 
+        cond2, cond3, cond4, cond5) if ind)
 
         query = query.format(cond=' AND '.join(conds))
         print('Query:', query)
@@ -109,6 +118,7 @@ class Mnem:
         query0 = 'DELETE FROM DATETIME WHERE ROWID <= {rowid};'
         dzen = Dzen2()
         dzen(record[0])
+
         self.conn.execute(query0.format(rowid=record[1]))
         self.conn.commit()
 
