@@ -76,9 +76,10 @@ values then it assumes all possible values for the given parameter.
 
 So, if you run the following command:
 
-    mnem -a 'this is a note' -u -i 40
+    mnem -a 'This is a note' -u -i 40
 
-It will assume years=current, months=current, days=current, hours=24, minutes=40
+It will assume years=current, months=current, days=current, hours=[1, 2, 3, ...24], minutes=40.
+That means it will display 'This is a note' the amount (24 - current-hour) in the current day.
 
 **Display a note daily**
 

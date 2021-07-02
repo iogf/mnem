@@ -47,13 +47,14 @@ class Mnem:
         VALUES %s ; '''
 
         tval = time.mktime(datetime(*date, second=0).timetuple())
-        query = query % str((tval, ) + date + (regcmd_id, ))
-        self.conn.execute(query)
+
+        if tval >= time.time():
+            self.conn.execute(query % str((tval, ) + date + (regcmd_id, )))
 
     def exp_dates(self, years, months, days, hours, minutes):
-        months  = months if months else range(1, 12)
+        months  = months if months else range(1, 13)
         hours   = hours if  hours else range(1, 24) 
-        minutes = minutes if minutes else range(1, 12) 
+        minutes = minutes if minutes else range(1, 60) 
 
         if bool(days) is True :
             return product(years, months, days, hours, minutes)
