@@ -32,41 +32,44 @@ Figure out how to execute mnem at your graphical environment startup.
 
 mnem accepts the following parameters:
 
-   usage: mnem [-h] [-i [MINUTES ...]] [-ii [FIND_MINUTES ...]] [-m [MONTHS ...]] 
-               [-mm [FIND_MONTHS ...]] [-y [YEARS ...]] [-yy [FIND_YEARS ...]] [-u [HOURS ...]]
-               [-uu [FIND_HOURS ...]] [-d [DAYS ...]] [-dd [FIND_DAYS ...]] [-a] [-f] [-r]
-               [msg]
-   
-   positional arguments:
-     msg                   Messages
-   
-   optional arguments:
-     -h, --help            show this help message and exit
-     -i [MINUTES ...], --minutes [MINUTES ...]
-                           List of minutes.
-     -ii [FIND_MINUTES ...], --find-minutes [FIND_MINUTES ...]
-                           Find notes based on minute.
-     -m [MONTHS ...], --months [MONTHS ...]
-                           List of months.
-     -mm [FIND_MONTHS ...], --find-months [FIND_MONTHS ...]
-                           Find notes based on month.
-     -y [YEARS ...], --years [YEARS ...]
-                           List of years.
-     -yy [FIND_YEARS ...], --find-years [FIND_YEARS ...]
-                           Find notes based on year.
-     -u [HOURS ...], --hours [HOURS ...]
-                           List of hours.
-     -uu [FIND_HOURS ...], --find-hours [FIND_HOURS ...]
-                           Find notes based on hours.
-     -d [DAYS ...], --days [DAYS ...]
-                           List of days.
-     -dd [FIND_DAYS ...], --find-days [FIND_DAYS ...]
-                           Find notes based on days.
-     -a, --add             Add a note.
-     -f, --find            Find a note based on a regex.
-     -r, --remove          Remove a note based on a regex.
-   [tau@fedora ~]$ 
-       
+~~~
+usage: mnem [-h] [-i [MINUTES ...]] [-ii [FIND_MINUTES ...]] [-m [MONTHS ...]] 
+            [-mm [FIND_MONTHS ...]] [-y [YEARS ...]] [-yy [FIND_YEARS ...]] [-u [HOURS ...]]
+            [-uu [FIND_HOURS ...]] [-d [DAYS ...]] [-dd [FIND_DAYS ...]] [-a] [-f] [-r]
+            [msg]
+
+positional arguments:
+  msg                   Messages
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i [MINUTES ...], --minutes [MINUTES ...]
+                        List of minutes.
+  -ii [FIND_MINUTES ...], --find-minutes [FIND_MINUTES ...]
+                        Find notes based on minute.
+  -m [MONTHS ...], --months [MONTHS ...]
+                        List of months.
+  -mm [FIND_MONTHS ...], --find-months [FIND_MONTHS ...]
+                        Find notes based on month.
+  -y [YEARS ...], --years [YEARS ...]
+                        List of years.
+  -yy [FIND_YEARS ...], --find-years [FIND_YEARS ...]
+                        Find notes based on year.
+  -u [HOURS ...], --hours [HOURS ...]
+                        List of hours.
+  -uu [FIND_HOURS ...], --find-hours [FIND_HOURS ...]
+                        Find notes based on hours.
+  -d [DAYS ...], --days [DAYS ...]
+                        List of days.
+  -dd [FIND_DAYS ...], --find-days [FIND_DAYS ...]
+                        Find notes based on days.
+  -a, --add             Add a note.
+  -f, --find            Find a note based on a regex.
+  -r, --remove          Remove a note based on a regex.
+[tau@fedora ~]$ 
+    
+~~~
+
 When mnem doesnt find one of the parameters -i -m, -y, -u, -d it assumes the current values 
 for years, minutes, days etc. When it finds these parameters and they aren't followed by
 values then it assumes all possible values for the given parameter.
