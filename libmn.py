@@ -70,7 +70,7 @@ class Mnem:
         pass
 
     def find(self, msg, years, months, days, hours, minutes):
-        query = '''SELECT DISTINCT cmd FROM REGCMD INNER JOIN DATETIME ON
+        query = '''SELECT DISTINCT CMD, TIME FROM REGCMD INNER JOIN DATETIME ON
         REGCMD.ROWID = DATETIME.REGCMD_ID AND {cond}
         '''
 
@@ -94,10 +94,8 @@ class Mnem:
         print('Query:', query)
         cursor  = self.conn.execute(query)
         records = cursor.fetchall()
+        return records
 
-        for ind in records:
-            print('Cmd:', ind)
-        
     def process(self):
         now = datetime.now()
         query0 = '''SELECT MSG, DATETIME.ROWID FROM REGCMD INNER JOIN DATETIME

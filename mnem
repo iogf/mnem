@@ -14,8 +14,13 @@ import os
 mnem = Mnem(join(expanduser('~'), 'mnem.db'))
 
 def handle_find(args):
-    mnem.find(args.msg, args.find_years, 
+    records = mnem.find(args.msg, args.find_years, 
     args.find_months, args.find_days, args.find_hours, args.find_minutes)
+
+    for cmd, tval in records:
+        timestamp = datetime.fromtimestamp(tval)
+        print('Cmd:', cmd, 'Date:', 
+            timestamp.strftime('%Y-%m-%d %H:%M:%S'))
 
 def handle_add(args):
     dates = mnem.exp_dates(args.years, 
@@ -36,7 +41,7 @@ def main():
     parser.add_argument(
     '-ii', '--find-minutes', 
     default=[],  type=int,
-    nargs='*', help='List of minutes.')
+    nargs='*', help='Find notes based on minute. ')
 
     parser.add_argument(
     '-m', '--months', dest='months',    
@@ -44,26 +49,26 @@ def main():
     nargs='*', help='List of months.')
 
     parser.add_argument('-mm', '--find-months', 
-    default=[],  type=int, nargs='*', help='List of months.')
+    default=[],  type=int, nargs='*', help='Find notes based on month.')
 
     parser.add_argument('-y', '--years', 
     default=[today.year], type=int, nargs='*', 
     help='List of years.')
 
     parser.add_argument('-yy', '--find-years', 
-    default=[], type=int, nargs='*', help='List of years.')
+    default=[], type=int, nargs='*', help='Find notes based on year.')
 
     parser.add_argument('-u', '--hours', default=[today.hour],  
     type=int, nargs='*', help='List of hours.')
 
     parser.add_argument('-uu', '--find-hours', 
-    default=[],  type=int, nargs='*', help='List of hours.')
+    default=[],  type=int, nargs='*', help='Find notes based on hours.')
 
     parser.add_argument('-d', '--days', default=[today.day],  
     type=int, nargs='*', help='List of days.')
 
     parser.add_argument('-dd', '--find-days', default=[],  
-    type=int, nargs='*', help='List of days.')
+    type=int, nargs='*', help='Find notes based on days.')
 
     parser.add_argument('-a', '--add', dest='cmd', 
     action='store_const', const=handle_add, help='Add a note.')
