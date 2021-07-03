@@ -28,7 +28,7 @@ It is needed first to start mnem daemon, in order to do that just issue the comm
     mnem-daemon
 
 That is enough to have mnem daemon running. 
-Figure out how to execute mnem at your graphical environment startup.
+Figure out how to execute mnem-daemon at your graphical environment startup.
 
 mnem accepts the following parameters:
 
@@ -87,9 +87,7 @@ That means it will display 'This is a note' the amount (24 - current-hour) in th
 
 **Display a note monthly**
   
-    mnem -a 'Title
-    It is a message.
-    ' -m 
+    mnem -a 'Title It is a message.' -m 
 
 The above command will assume days=current, years=current, minutes=current.
 So, the message above will be displayed every month in the same time of the day
@@ -120,6 +118,13 @@ It will display a note when it is 18/03/2016 at 10:44 am. and when it is
 
     mnem -f 'somestring'
 
-It finds all set of notes that contains 'somestring' in.
+It finds all set of notes that contains 'somestring' in. You can also combine the 
+letter doubled arguments -ii, -mm, -uu, -yy, -dd to perform searches in the mnem database.
 
+Like in:
+
+    mnem -f 'somestring' -ii 20 -dd 20
+
+That would find all notes that contain 'somestring' and are going to be displayed at a datetime
+like YY:MM:20 HH:20:SS.
 

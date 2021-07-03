@@ -11,13 +11,11 @@ import time
 
 dzen2 = Dzen2()
 mnem  = Mnem(join(expanduser('~'), 'mnem.db'), dzen2)
-# 
 # mnem_pid = PIDLockFile(join(tempfile.gettempdir(), 'mnem.pid'))
 # context  = DaemonContext(pidfile=mnem_pid, stdout=sys.stdout, stderr=sys.stderr)
-# # signal_map = {signal.SIGUSR1: reload}
+# 
 # with context:
-    # print('Daemon started.')
-    # mnem.mainloop()
+# print('Daemon started.')
 mnem.mainloop()
 
 

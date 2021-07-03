@@ -3,7 +3,7 @@ from subprocess import call
 from itertools import product
 from calendar import monthrange
 import sqlite3
-import time
+from time import mktime, time
 import os
 
 class Mnem:
@@ -20,36 +20,40 @@ class Mnem:
         REGCMD_ID INT, FOREIGN KEY(REGCMD_ID) REFERENCES REGCMD(ROWID)
         ON DELETE CASCADE); ''')
 
-        self.conn.execute(''' create trigger 
-        if not exists clean after delete on datetime
-        when (select count(*) from datetime where regcmd_id = OLD.regcmd_id) = 0
-        
-        begin
-        delete from regcmd where rowid = OLD.regcmd_id;
-        end;''')
+        self.conn.execute(''' CREATE TRIGGER 
+        IF NOT EXISTS CLEAN AFTER DELETE ON DATETIME
+        WHEN (SELECT COUNT(*) FROM DATETIME WHERE REGCMD_ID = OLD.REGCMD_ID) = 0
+        BEGIN
+        DELETE FROM REGCMD WHERE ROWID = OLD.REGCMD_ID;
+        END;''')
 
         self.conn.commit()
 
     def add_note(self, cmd, msg, dates):
+        dates = ((date, mktime(datetime(*date, 
+        second=0).timetuple())) for date in dates)
+
+        dates = [(date, tval) for date, tval in dates 
+        if tval >= time()]
+
+        if bool(dates) is False: return dates
+
         query0 = ''' INSERT INTO REGCMD (CMD, MSG) 
         VALUES ('{cmd}', '{msg}'); '''
+        query0 = query0.format(cmd=cmd, msg=msg)
 
-        cursor = self.conn.execute(query0.format(cmd=cmd, msg=msg))
+        cursor = self.conn.execute(query0)
         self.conn.commit()
 
-        for ind in dates:
-            self.mk_qdate(ind, cursor.lastrowid)
-        self.conn.commit()
-
-    def mk_qdate(self, date, regcmd_id):
-        query = ''' INSERT INTO DATETIME 
+        query1 = ''' INSERT INTO DATETIME 
         (TIME, YEAR, MONTH, DAY, HOUR, MINUTE, REGCMD_ID) 
-        VALUES %s ; '''
+        VALUES  {values} ; '''
 
-        tval = time.mktime(datetime(*date, second=0).timetuple())
-
-        if tval >= time.time():
-            self.conn.execute(query % str((tval, ) + date + (regcmd_id, )))
+        for date, tval in dates:
+            self.conn.execute(query1.format(
+                values=str((tval, ) + date + (cursor.lastrowid, ))))
+        self.conn.commit()
+        return dates
 
     def exp_dates(self, years, months, days, hours, minutes):
         months  = months if months else range(1, 13)
@@ -67,12 +71,14 @@ class Mnem:
             yield from product((year,), (month,), range(1, 
                 monthrange(year, month)[1]), hours, minutes) 
 
-    def del_note(self, regex):
-        pass
+    def del_note(self, regcmd_id):
+        query = '''DELETE FROM REGCMD WHERE ROWID = {rowid}'''
+        self.conn.execute(query.format(rowid=regcmd_id))
+        self.conn.commit()
 
     def find(self, msg, years, months, days, hours, minutes):
-        query = '''SELECT DISTINCT CMD, TIME FROM REGCMD INNER JOIN DATETIME ON
-        REGCMD.ROWID = DATETIME.REGCMD_ID AND {cond}
+        query = '''SELECT DISTINCT CMD, TIME, REGCMD_ID FROM REGCMD 
+        INNER JOIN DATETIME ON REGCMD.ROWID = DATETIME.REGCMD_ID AND {cond}
         '''
 
         years = ', '.join((str(ind) for ind in years))

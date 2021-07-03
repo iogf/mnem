@@ -17,15 +17,18 @@ def handle_find(args):
     records = mnem.find(args.msg, args.find_years, 
     args.find_months, args.find_days, args.find_hours, args.find_minutes)
 
-    for cmd, tval in records:
+    for cmd, tval, id in records:
         timestamp = datetime.fromtimestamp(tval)
-        print('Cmd:', cmd, 'Date:', 
+        print('ID:', id, 'Cmd:', cmd, 'Date:', 
             timestamp.strftime('%Y-%m-%d %H:%M:%S'))
 
 def handle_add(args):
     dates = mnem.exp_dates(args.years, 
     args.months, args.days, args.hours, args.minutes)
     mnem.add_note(' '.join(sys.argv), args.msg, dates)
+
+def handle_remove(args):
+    pass
 
 def main():
     today  = datetime.today()
@@ -78,8 +81,7 @@ def main():
     help='Find a note based on a regex.')
 
     parser.add_argument('-r', '--remove', dest='cmd', 
-    action='store_const', const=lambda args: 
-    mnem.del_note(args.msg), 
+    action='store_const', const=handle_remove, 
     help='Remove a note based on a regex.')
     args = parser.parse_args()
 
@@ -89,8 +91,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # mnem_pid = PIDLockFile(join(tempfile.gettempdir(), 'mnem.pid'))
-    # pid      = mnem_pid.read_pid()
-    # os.kill(pid, signal.SIGUSR1)
 
 
