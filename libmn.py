@@ -3,7 +3,7 @@ from subprocess import call
 from itertools import product
 from calendar import monthrange
 import sqlite3
-from time import mktime, time
+from time import mktime, time, sleep
 import os
 
 class Mnem:
@@ -11,7 +11,6 @@ class Mnem:
         self.dbpath = dbpath
         self.handle = handle
         self.conn   = sqlite3.connect(dbpath)
-
         self.conn.execute(''' CREATE TABLE IF NOT EXISTS REGCMD
         (CMD TEXT, MSG TEXT); ''')
 
@@ -55,7 +54,7 @@ class Mnem:
         self.conn.commit()
         return dates
 
-    def exp_dates(self, years, months, days, hours, minutes):
+    def expand_dates(self, years, months, days, hours, minutes):
         months  = months if months else range(1, 13)
         hours   = hours if  hours else range(1, 24) 
         minutes = minutes if minutes else range(1, 60) 
@@ -109,7 +108,7 @@ class Mnem:
         ON DATETIME.TIME <= {time} AND REGCMD.ROWID = DATETIME.REGCMD_ID;
         '''
 
-        tval = time.mktime(datetime(year=now.year, month=now.month, 
+        tval = mktime(datetime(year=now.year, month=now.month, 
         day=now.day, hour=now.hour, minute=now.minute).timetuple())
         query0  = query0.format(time=tval)
         cursor  = self.conn.execute(query0)
@@ -129,7 +128,11 @@ class Mnem:
 
     def mainloop(self):
         while True:
-            time.sleep(5); self.process()
+            sleep(5); self.process()
+
+    def reload_conn(self):
+        self.conn.close()
+        self.conn = sqlite3.connect(dbpath)
 
 class Dzen2:
     def __call__(self, msg):

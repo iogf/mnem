@@ -23,7 +23,7 @@ def handle_find(args):
             timestamp.strftime('%Y-%m-%d %H:%M:%S'))
 
 def handle_add(args):
-    dates = mnem.exp_dates(args.years, 
+    dates = mnem.expand_dates(args.years, 
     args.months, args.days, args.hours, args.minutes)
     mnem.add_note(' '.join(sys.argv), args.msg, dates)
 
@@ -91,5 +91,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # mnem_pid = PIDLockFile(join(tempfile.gettempdir(), '.mnem.pid'))
+    # pid = mnem_pid.read_pid()
+    # os.kill(pid, signal.SIGUSR1)
 
 
