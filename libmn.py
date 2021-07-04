@@ -70,9 +70,12 @@ class Mnem:
             yield from product((year,), (month,), range(1, 
                 monthrange(year, month)[1]), hours, minutes) 
 
-    def del_note(self, regcmd_id):
-        query = '''DELETE FROM REGCMD WHERE ROWID = {rowid}'''
-        self.conn.execute(query.format(rowid=regcmd_id))
+    def del_notes(self, ids):
+        query = 'DELETE FROM REGCMD WHERE ROWID IN {rowids};'
+        ids = '(%s)' % ', '.join((str(ind) for ind in ids))
+        query = query.format(rowids=ids)
+        print(query)
+        self.conn.execute(query)
         self.conn.commit()
 
     def find(self, msg, years, months, days, hours, minutes):

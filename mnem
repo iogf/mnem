@@ -28,7 +28,15 @@ def handle_add(args):
     mnem.add_note(' '.join(sys.argv), args.msg, dates)
 
 def handle_remove(args):
-    pass
+    records = mnem.find(args.msg, args.find_years, 
+    args.find_months, args.find_days, args.find_hours, args.find_minutes)
+    ids = (ind[2] for ind in records)    
+    mnem.del_notes(set(ids))
+
+    for cmd, tval, id in records:
+        timestamp = datetime.fromtimestamp(tval)
+        print('Deleted ID:', id, 'Cmd:', cmd, 'Date:', 
+            timestamp.strftime('%Y-%m-%d %H:%M:%S'))
 
 def main():
     today  = datetime.today()
