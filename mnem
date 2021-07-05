@@ -26,7 +26,12 @@ def handle_find(args):
 def handle_add(args):
     dates = mnem.expand_dates(args.years, 
     args.months, args.days, args.hours, args.minutes)
-    mnem.add_note(' '.join(sys.argv), args.msg, dates)
+    records = mnem.add_note(' '.join(sys.argv), args.msg, dates)
+
+    for cmd, tval in records:
+        timestamp = datetime.fromtimestamp(tval)
+        print('Created Note:',
+            timestamp.strftime('%Y-%m-%d %H:%M:%S'))
 
 def handle_remove(args):
     records = mnem.find(args.msg, args.find_years, 
