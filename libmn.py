@@ -29,13 +29,15 @@ class Mnem:
         self.conn.commit()
 
     def add_note(self, cmd, msg, dates):
-        dates = ((date, mktime(datetime(*date, 
-        second=0).timetuple())) for date in dates)
+        dates = [(date, mktime(datetime(*date, 
+        second=0).timetuple())) for date in dates]
 
-        dates = [(date, tval) for date, tval in dates 
-        if tval >= time()]
-
-        if bool(dates) is False: return dates
+        for ind in range(0, len(dates)):
+            if dates[ind][1] < time():
+                del dates[ind]
+        else:
+            if bool(dates) is False: 
+                return dates
 
         query0 = ''' INSERT INTO REGCMD (CMD, MSG) 
         VALUES ('{cmd}', '{msg}'); '''
