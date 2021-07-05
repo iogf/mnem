@@ -56,8 +56,8 @@ class Mnem:
 
     def expand_dates(self, years, months, days, hours, minutes):
         months  = months if months else range(1, 13)
-        hours   = hours if  hours else range(1, 24) 
-        minutes = minutes if minutes else range(1, 60) 
+        hours   = hours if  hours else range(0, 24) 
+        minutes = minutes if minutes else range(0, 59) 
 
         if bool(days) is True :
             return product(years, months, days, hours, minutes)
@@ -68,7 +68,7 @@ class Mnem:
         dates = product(years, months)
         for year, month in dates:
             yield from product((year,), (month,), range(1, 
-                monthrange(year, month)[1]), hours, minutes) 
+                monthrange(year, month)[1] + 1), hours, minutes) 
 
     def del_notes(self, ids):
         query = 'DELETE FROM REGCMD WHERE ROWID IN {rowids};'

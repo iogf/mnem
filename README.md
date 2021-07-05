@@ -6,7 +6,6 @@ A note reminder that uses dzen2 to display notes
 Install
 =======
 
-    pip install python-daemon
     pip install mnem
 
 Note: It demands dzen2 menu to display the reminders.
