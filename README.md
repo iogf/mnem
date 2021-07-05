@@ -98,7 +98,7 @@ that the command was issued.
     mnem -a 'Testing' -m -d 1 
   
 
-The above command tells mnem to display the note in the day 1 of each month along the
+The above command tells mnem to display the note in the first day of each month along the
 current year.
 
 **Display a note daily at a specific time**
@@ -127,4 +127,20 @@ Like in:
 
 That would find all notes that contain 'somestring' and are going to be displayed at a datetime
 like YY:MM:20 HH:20:SS.
+
+**Delete notes**
+
+The following command can be issued in order to delte a note.
+
+    mnem -r NOTE_ID
+
+However it is also possible to mix parameters like -mm, -dd, -yy etc to delete notes
+that match the desired pattern. The variant --remove or -r accepts the same parameters as
+the command variant -f or --find.
+
+Thus.
+
+    mnem -r 'Cool' -m 6
+
+Would delete all notes whose note msg contains the string 'Cool' and its displaying month is 6.
 

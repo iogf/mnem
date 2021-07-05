@@ -1,10 +1,15 @@
+from mnem import Mnem
 import unittest
+import sqlite3
 
 class TestMnem(unittest.TestCase):
-    def test_upper(self):
+    def setUP(self):
+        pass
+
+    def test0(self):
         self.assertEqual('foo'.upper(), 'FOO')
 
-    def test_isupper(self):
+    def test1(self):
         self.assertTrue('FOO'.isupper())
         self.assertFalse('Foo'.isupper())
 

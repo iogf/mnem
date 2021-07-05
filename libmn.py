@@ -78,7 +78,7 @@ class Mnem:
         self.conn.execute(query)
         self.conn.commit()
 
-    def find(self, msg, years, months, days, hours, minutes):
+    def find(self, msg, years, months, days, hours, minutes, index):
         query = '''SELECT DISTINCT CMD, TIME, REGCMD_ID FROM REGCMD 
         INNER JOIN DATETIME ON REGCMD.ROWID = DATETIME.REGCMD_ID AND {cond}
         '''
@@ -88,12 +88,15 @@ class Mnem:
         days = ', '.join((str(ind) for ind in days))
         hours = ', '.join((str(ind) for ind in hours))
         minutes = ', '.join((str(ind) for ind in minutes))
+        index = ', '.join((str(ind) for ind in index))
 
         cond0 = ('DATETIME.YEAR IN (%s)' % years) if years else ''
         cond1 = ('DATETIME.MONTH IN (%s)' % months) if months else ''
         cond2 = ('DATETIME.DAY IN (%s)' % days) if days else ''
         cond3 = ('DATETIME.HOUR IN (%s)' % hours) if hours else ''
         cond4 = ('DATETIME.MINUTE IN (%s)' % minutes) if minutes else ''
+        cond4 = ('DATETIME.REGCMD_ID IN (%s)' % index) if index else ''
+
         cond5 = "REGCMD.MSG LIKE '%{msg}%'".format(msg = (msg if msg else ''))
 
         conds = (ind for ind in (cond0, cond1, 

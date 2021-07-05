@@ -15,7 +15,8 @@ mnem = Mnem(join(expanduser('~'), 'mnem.db'))
 
 def handle_find(args):
     records = mnem.find(args.msg, args.find_years, 
-    args.find_months, args.find_days, args.find_hours, args.find_minutes)
+    args.find_months, args.find_days, args.find_hours, 
+    args.find_minutes, args.find_index)
 
     for cmd, tval, id in records:
         timestamp = datetime.fromtimestamp(tval)
@@ -29,7 +30,9 @@ def handle_add(args):
 
 def handle_remove(args):
     records = mnem.find(args.msg, args.find_years, 
-    args.find_months, args.find_days, args.find_hours, args.find_minutes)
+    args.find_months, args.find_days, args.find_hours, 
+    args.find_minutes, args.find_index)
+
     ids = (ind[2] for ind in records)    
     mnem.del_notes(set(ids))
 
@@ -80,6 +83,9 @@ def main():
 
     parser.add_argument('-dd', '--find-days', default=[],  
     type=int, nargs='*', help='Find notes based on days.')
+
+    parser.add_argument('-x', '--find-index', default=[],  
+    type=int, nargs='*', help='Find notes based on index/id.')
 
     parser.add_argument('-a', '--add', dest='cmd', 
     action='store_const', const=handle_add, help='Add a note.')

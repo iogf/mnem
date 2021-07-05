@@ -1,13 +1,13 @@
 #!/usr/bin/python
 
-from daemon.pidfile import PIDLockFile
-from daemon import DaemonContext
+# from daemon.pidfile import PIDLockFile
+# from daemon import DaemonContext
 from os.path import join, expanduser
 from libmn import Mnem, Dzen2
-import signal
-import tempfile
-import sys
-import time
+# import signal
+# import tempfile
+# import sys
+# import time
 
 dzen2 = Dzen2()
 mnem  = Mnem(join(expanduser('~'), 'mnem.db'), dzen2)
