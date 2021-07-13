@@ -1,8 +1,10 @@
 from libmn import Mnem
 from os.path import join, expanduser
-
+from datetime import datetime, timedelta
 import unittest
+# from unittest import mock
 import sqlite3
+import time
 
 class TestMnem(unittest.TestCase):
     def setUp(self):
@@ -35,7 +37,11 @@ class TestMnem(unittest.TestCase):
         self.assertIn((2021, 2, 28, 23, 5), dates)
 
     def test1(self):
-        pass
+        dates = self.mnem.expand_dates([2021], [7], [12], [13], [55])
+
+        records = self.add_note('mnem Test -i 55', 'Test', dates)
+        with mock.patch('__main__.time', 
+            mock.MagicMock(return_value=12345)) as mocktime:
 
 if __name__ == '__main__':
     unittest.main()

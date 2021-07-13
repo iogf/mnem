@@ -111,13 +111,14 @@ class Mnem:
         return records
 
     def process(self):
-        now = datetime.now()
+        # now = datetime.now()
         query0 = '''SELECT MSG, DATETIME.ROWID FROM REGCMD INNER JOIN DATETIME
         ON DATETIME.TIME <= {time} AND REGCMD.ROWID = DATETIME.REGCMD_ID;
         '''
 
-        tval = mktime(datetime(year=now.year, month=now.month, 
-        day=now.day, hour=now.hour, minute=now.minute).timetuple())
+        # tval = mktime(datetime(year=now.year, month=now.month, 
+        # day=now.day, hour=now.hour, minute=now.minute).timetuple())
+        tval    = time()
         query0  = query0.format(time=tval)
         cursor  = self.conn.execute(query0)
         records = cursor.fetchall()
@@ -127,10 +128,10 @@ class Mnem:
         print(records)
 
     def display_and_update(self, record):
-        query0 = 'DELETE FROM DATETIME WHERE ROWID <= {rowid};'
+        query0 = 'DELETE FROM DATETIME WHERE ROWID = {rowid};'
         dzen = Dzen2()
         dzen(record[0])
-
+        print('Record', record)
         self.conn.execute(query0.format(rowid=record[1]))
         self.conn.commit()
 
