@@ -38,6 +38,8 @@ class TestMnem(unittest.TestCase):
 
     def test1(self):
         dates = self.mnem.expand_dates([2021], [7], [12], [13], [55])
+        # tval = mktime(datetime(year=now.year, month=now.month, 
+        # day=now.day, hour=now.hour, minute=now.minute).timetuple())
 
         records = self.add_note('mnem Test -i 55', 'Test', dates)
         with mock.patch('__main__.time', 

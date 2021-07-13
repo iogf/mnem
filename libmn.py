@@ -40,19 +40,18 @@ class Mnem:
                 return dates
 
         query0 = ''' INSERT INTO REGCMD (CMD, MSG) 
-        VALUES ('{cmd}', '{msg}'); '''
-        query0 = query0.format(cmd=cmd, msg=msg)
+        VALUES (?, ?); '''
 
-        cursor = self.conn.execute(query0)
+        cursor = self.conn.execute(query0, (cmd, msg))
         self.conn.commit()
 
         query1 = ''' INSERT INTO DATETIME 
         (TIME, YEAR, MONTH, DAY, HOUR, MINUTE, REGCMD_ID) 
-        VALUES  {values} ; '''
+        VALUES  (?, ?, ?, ?, ?, ?, ?) ; '''
 
         for date, tval in dates:
-            self.conn.execute(query1.format(
-                values=str((tval, ) + date + (cursor.lastrowid, ))))
+            self.conn.execute(query1, 
+                ((tval, ) + date + (cursor.lastrowid, )))
         self.conn.commit()
         return dates
 
@@ -75,6 +74,7 @@ class Mnem:
     def del_notes(self, ids):
         query = 'DELETE FROM REGCMD WHERE ROWID IN {rowids};'
         ids = '(%s)' % ', '.join((str(ind) for ind in ids))
+
         query = query.format(rowids=ids)
         print(query)
         self.conn.execute(query)
@@ -105,7 +105,7 @@ class Mnem:
         cond2, cond3, cond4, cond5) if ind)
 
         query = query.format(cond=' AND '.join(conds))
-        print('Query:', query)
+        print('Sql:', query)
         cursor  = self.conn.execute(query)
         records = cursor.fetchall()
         return records
@@ -125,14 +125,13 @@ class Mnem:
 
         for ind in records:
             self.display_and_update(ind)
-        print(records)
 
     def display_and_update(self, record):
-        query0 = 'DELETE FROM DATETIME WHERE ROWID = {rowid};'
+        query0 = 'DELETE FROM DATETIME WHERE ROWID = ?;'
         dzen = Dzen2()
         dzen(record[0])
-        print('Record', record)
-        self.conn.execute(query0.format(rowid=record[1]))
+        print('Msg:', record[1], 'Id:', record[0])
+        self.conn.execute(query0, (record[1], ))
         self.conn.commit()
 
     def mainloop(self):
