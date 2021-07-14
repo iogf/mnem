@@ -128,8 +128,9 @@ class Mnem:
 
     def display_and_update(self, record):
         query0 = 'DELETE FROM DATETIME WHERE ROWID = ?;'
-        dzen = Dzen2()
-        dzen(record[0])
+        self.handle(record[0])
+        # dzen = Dzen2()
+        # dzen(record[0])
         print('Msg:', record[1], 'Id:', record[0])
         self.conn.execute(query0, (record[1], ))
         self.conn.commit()
