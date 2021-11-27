@@ -11,20 +11,21 @@ class Mnem:
         self.dbpath = dbpath
         self.handle = handle
         self.conn   = sqlite3.connect(dbpath)
+        self.conn.execute("PRAGMA foreign_keys=ON;")
         self.conn.execute(''' CREATE TABLE IF NOT EXISTS REGCMD
-        (CMD TEXT, MSG TEXT); ''')
+        (CMD TEXT, MSG TEXT, REGCMD_ID INTEGER PRIMARY KEY); ''')
 
         self.conn.execute(''' CREATE TABLE IF NOT EXISTS DATETIME
         (TIME INT, YEAR INT, MONTH INT, DAY INT, HOUR INT, MINUTE INT, 
-        REGCMD_ID INT, FOREIGN KEY(REGCMD_ID) REFERENCES REGCMD(ROWID)
+        REGCMD_ID INT, FOREIGN KEY(REGCMD_ID) REFERENCES REGCMD(REGCMD_ID)
         ON DELETE CASCADE); ''')
 
-        self.conn.execute(''' CREATE TRIGGER 
-        IF NOT EXISTS CLEAN AFTER DELETE ON DATETIME
-        WHEN (SELECT COUNT(*) FROM DATETIME WHERE REGCMD_ID = OLD.REGCMD_ID) = 0
-        BEGIN
-        DELETE FROM REGCMD WHERE ROWID = OLD.REGCMD_ID;
-        END;''')
+        # self.conn.execute(''' CREATE TRIGGER 
+        # IF NOT EXISTS CLEAN AFTER DELETE ON DATETIME
+        # WHEN (SELECT COUNT(*) FROM DATETIME WHERE REGCMD_ID = OLD.REGCMD_ID) = 0
+        # BEGIN
+        # DELETE FROM REGCMD WHERE ROWID = OLD.REGCMD_ID;
+        # END;''')
 
         self.conn.commit()
 
@@ -80,8 +81,8 @@ class Mnem:
         self.conn.commit()
 
     def find(self, msg, years, months, days, hours, minutes, index):
-        query = '''SELECT DISTINCT CMD, TIME, REGCMD_ID FROM REGCMD 
-        INNER JOIN DATETIME ON REGCMD.ROWID = DATETIME.REGCMD_ID AND {cond}
+        query = '''SELECT DISTINCT CMD, TIME, DATETIME.REGCMD_ID FROM REGCMD 
+        INNER JOIN DATETIME ON DATETIME.REGCMD_ID = REGCMD.REGCMD_ID AND {cond}
         '''
 
         years = ', '.join((str(ind) for ind in years))
@@ -110,13 +111,10 @@ class Mnem:
         return records
 
     def process(self):
-        # now = datetime.now()
         query0 = '''SELECT MSG, DATETIME.ROWID FROM REGCMD INNER JOIN DATETIME
         ON DATETIME.TIME <= {time} AND REGCMD.ROWID = DATETIME.REGCMD_ID;
         '''
 
-        # tval = mktime(datetime(year=now.year, month=now.month, 
-        # day=now.day, hour=now.hour, minute=now.minute).timetuple())
         tval    = time()
         query0  = query0.format(time=tval)
         cursor  = self.conn.execute(query0)
@@ -128,8 +126,7 @@ class Mnem:
     def display_and_update(self, record):
         query0 = 'DELETE FROM DATETIME WHERE ROWID = ?;'
         self.handle(record[0])
-        # dzen = Dzen2()
-        # dzen(record[0])
+
         print('Msg:', record[1], 'Id:', record[0])
         self.conn.execute(query0, (record[1], ))
         self.conn.commit()

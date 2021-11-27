@@ -40,10 +40,10 @@ class TestMnem(unittest.TestCase):
 
     def test1(self):
         """
-        Test Mnem.add_note superficially. It fakes time in order
-        to have registers created then it checks the DB structure to
-        be according to what it is expexted.
+        It fakes time in order to have registers created 
+        then it checks the DB structure to be according to what it is expected.
         """
+
         dates = self.mnem.expand_dates([2021], [7], [12], [13], [55])
         tval = mktime(datetime(year=2021, month=7, 
         day=12, hour=13, minute=55).timetuple())
