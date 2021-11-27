@@ -32,12 +32,11 @@ class Mnem:
         dates = [(date, mktime(datetime(*date, 
         second=0).timetuple())) for date in dates]
 
-        for ind in range(0, len(dates)):
-            if dates[ind][1] < time():
-                del dates[ind]
-        else:
-            if bool(dates) is False: 
-                return dates
+        dates = [(date, tm) for date, tm in dates 
+        if tm >= time()]
+
+        if bool(dates) is False: 
+            return dates
 
         query0 = ''' INSERT INTO REGCMD (CMD, MSG) 
         VALUES (?, ?); '''

@@ -69,7 +69,7 @@ optional arguments:
     
 ~~~
 
-When mnem doesnt find one of the parameters -i -m, -y, -u, -d it assumes the current values 
+When mnem doesn't find one of the parameters -i -m, -y, -u, -d it assumes the current values 
 for years, minutes, days etc. When it finds these parameters and they aren't followed by
 values then it assumes all possible values for the given parameter.
 
